@@ -106,7 +106,7 @@ const btnMenu = document.getElementById("btnMenu");
 async function inizializza() {
   msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
   await msalInstance.initialize();
-  const risposta = await msalInstance.handleRedirectPromise().catch(() => null);
+  const risposta = await msalInstance.handleRedirectPromise().catch((err) => { console.error("Errore handleRedirectPromise:", err); return null; });
   const account_esistente = msalInstance.getAllAccounts()[0];
   if (risposta?.account) account = risposta.account;
   else if (account_esistente) account = account_esistente;
@@ -125,7 +125,11 @@ async function inizializza() {
 }
 
 async function accedi() {
-  await msalInstance.loginRedirect({ scopes: SCOPES });
+  try {
+    await msalInstance.loginRedirect({ scopes: SCOPES });
+  } catch (err) {
+    alert("Errore durante l'accesso: " + (err.errorCode || err.message || err));
+  }
 }
 
 async function ottieniToken() {
